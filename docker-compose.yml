@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: hireflow-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: hireflow_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - hireflow-network
+
+  backend:
+    build: ./backend
+    container_name: hireflow-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      DB_NAME: hireflow_db
+      JWT_SECRET: ${JWT_SECRET}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
+      COMPREFACE_API_KEY: ${COMPREFACE_API_KEY}
+      COMPREFACE_URL: http://compreface-api:8000
+      AI_SERVICE_URL: http://ai-service:8080
+    depends_on:
+      - mysql
+      - compreface-api
+      - ai-service
+    networks:
+      - hireflow-network
+
+  frontend:
+    build: ./frontend
+    container_name: hireflow-frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - hireflow-network
+
+  ai-service:
+    build: ./ai-service
+    container_name: hireflow-ai-service
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      FLASK_ENV: production
+    networks:
+      - hireflow-network
+
+  compreface-postgres:
+    image: postgres:14
+    container_name: compreface-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${COMPREFACE_POSTGRES_PASSWORD}
+      POSTGRES_DB: frs
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - hireflow-network
+
+  compreface-api:
+    image: exadel/compreface-core:latest
+    container_name: compreface-api
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${COMPREFACE_POSTGRES_PASSWORD}
+      POSTGRES_URL: jdbc:postgresql://compreface-postgres:5432/frs
+    depends_on:
+      - compreface-postgres
+    ports:
+      - "8000:8000"
+    networks:
+      - hireflow-network
+
+  compreface-admin:
+    image: exadel/compreface-admin:latest
+    container_name: compreface-admin
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${COMPREFACE_POSTGRES_PASSWORD}
+      POSTGRES_URL: jdbc:postgresql://compreface-postgres:5432/frs
+      ADMIN_JAVA_OPTS: -Xmx8g
+    depends_on:
+      - compreface-postgres
+      - compreface-api
+    ports:
+      - "8001:8080"
+    networks:
+      - hireflow-network
+
+volumes:
+  mysql_data:
+  postgres_data:
+
+networks:
+  hireflow-network:
+    driver: bridge
