@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { FaBell, FaEnvelope, FaUser, FaSignOutAlt, FaBars, FaTimes, FaChevronDown } from 'react-icons/fa';
 import { logout } from '../redux/slices/authSlice';
+import NotificationCenter from './NotificationCenter';
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -166,18 +167,8 @@ const Navbar = () => {
                     <FaEnvelope className="h-5 w-5" />
                   </Link>
 
-                  {/* Notifications */}
-                  <Link
-                    to={`/${user?.role}/dashboard`}
-                    className="relative p-2.5 rounded-lg text-gray-600 hover:text-primary-600 hover:bg-gray-50 transition-all duration-200"
-                  >
-                    <FaBell className="h-5 w-5" />
-                    {unreadCount > 0 && (
-                      <span className="absolute top-1 right-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold shadow-lg animate-pulse">
-                        {unreadCount > 9 ? '9+' : unreadCount}
-                      </span>
-                    )}
-                  </Link>
+                  {/* Notifications - Using NotificationCenter Component */}
+                  <NotificationCenter />
 
                   {/* Profile Dropdown */}
                   <div className="relative">

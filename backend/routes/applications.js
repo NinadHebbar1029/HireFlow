@@ -168,7 +168,7 @@ router.put('/:id/status', authenticateToken, authorizeRoles('recruiter'), checkU
     const { id } = req.params;
     const { status } = req.body;
 
-    if (!['pending', 'shortlisted', 'rejected', 'interviewed', 'hired'].includes(status)) {
+    if (!['pending', 'reviewing', 'shortlisted', 'interview', 'interviewed', 'hired', 'rejected'].includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
     }
 
@@ -240,6 +240,100 @@ router.get('/:id', authenticateToken, checkUserStatus, async (req, res) => {
   } catch (error) {
     console.error('Get application error:', error);
     res.status(500).json({ error: 'Failed to fetch application' });
+  }
+});
+
+// Get application details with full applicant profile
+router.get('/:id/details', authenticateToken, authorizeRoles('recruiter'), checkUserStatus, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    console.log('Fetching application details:', { applicationId: id, userId });
+
+    // Get application data and verify recruiter owns this job
+    const [applications] = await db.query(`
+      SELECT a.*, j.title as job_title, j.description as job_description, j.recruiter_id
+      FROM applications a
+      JOIN jobs j ON a.job_id = j.id
+      WHERE a.id = ?
+    `, [id]);
+
+    if (applications.length === 0) {
+      console.log('Application not found:', id);
+      return res.status(404).json({ error: 'Application not found' });
+    }
+
+    const application = applications[0];
+
+    // Verify the recruiter owns this job
+    const [recruiterProfile] = await db.query(
+      'SELECT id FROM recruiter_profiles WHERE user_id = ?',
+      [userId]
+    );
+
+    if (recruiterProfile.length === 0) {
+      console.log('Recruiter profile not found for user:', userId);
+      return res.status(403).json({ error: 'Recruiter profile not found' });
+    }
+
+    if (application.recruiter_id !== recruiterProfile[0].id) {
+      console.log('Access denied: Application belongs to different recruiter');
+      return res.status(403).json({ error: 'You do not have permission to view this application' });
+    }
+
+    console.log('Application found, fetching applicant profile for job_seeker_id:', application.job_seeker_id);
+
+    // Get applicant profile with skills
+    const [applicants] = await db.query(`
+      SELECT 
+        jsp.id,
+        jsp.full_name,
+        jsp.phone,
+        jsp.location,
+        jsp.bio,
+        jsp.resume_url,
+        jsp.profile_image_url,
+        u.email,
+        GROUP_CONCAT(DISTINCT CONCAT(s.id, ':', s.name, ':', jss.proficiency_level)) as skills
+      FROM job_seeker_profiles jsp
+      JOIN users u ON jsp.user_id = u.id
+      LEFT JOIN job_seeker_skills jss ON jsp.id = jss.job_seeker_id
+      LEFT JOIN skills s ON jss.skill_id = s.id
+      WHERE jsp.id = ?
+      GROUP BY jsp.id
+    `, [application.job_seeker_id]);
+
+    if (applicants.length === 0) {
+      console.log('Applicant profile not found for job_seeker_id:', application.job_seeker_id);
+      return res.status(404).json({ error: 'Applicant profile not found' });
+    }
+
+    const applicant = applicants[0];
+
+    // Parse skills
+    if (applicant.skills) {
+      applicant.skills = applicant.skills.split(',').map(skill => {
+        const [id, name, proficiency_level] = skill.split(':');
+        return { 
+          skill_id: parseInt(id), 
+          skill_name: name, 
+          proficiency_level 
+        };
+      });
+    } else {
+      applicant.skills = [];
+    }
+
+    console.log('Successfully fetched application and applicant data');
+
+    res.json({ 
+      application,
+      applicant 
+    });
+  } catch (error) {
+    console.error('Get application details error:', error);
+    res.status(500).json({ error: 'Failed to fetch application details' });
   }
 });
 

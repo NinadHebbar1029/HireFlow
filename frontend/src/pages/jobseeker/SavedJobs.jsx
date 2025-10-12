@@ -1,7 +1,8 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { FaBookmark, FaMapMarkerAlt, FaBriefcase, FaDollarSign, FaTrash, FaEye } from 'react-icons/fa';
+import { FaBookmark, FaMapMarkerAlt, FaBriefcase, FaDollarSign, FaTrash, FaEye, FaHeart, FaHeartBroken, FaClock, FaBuilding, FaRocket, FaStar, FaFire, FaCheckCircle } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 import api from '../../utils/api';
 import Layout from '../../components/Layout';
 
@@ -39,8 +40,16 @@ const SavedJobs = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="flex justify-center items-center h-screen">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600"></div>
+        <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="relative inline-block">
+              <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-pink-600"></div>
+              <FaHeart className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-pink-600 text-2xl animate-pulse" />
+            </div>
+            <p className="mt-6 text-xl font-semibold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+              Loading your saved jobs...
+            </p>
+          </div>
         </div>
       </Layout>
     );
@@ -48,112 +57,217 @@ const SavedJobs = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center">
-              <FaBookmark className="mr-4 text-primary-600" />
-              Saved Jobs
-            </h1>
-            <p className="text-gray-600 text-lg">Jobs you've bookmarked for later</p>
-          </div>
+          {/* Enhanced Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative bg-gradient-to-br from-pink-600 via-purple-600 to-indigo-600 rounded-3xl shadow-2xl p-10 mb-12 overflow-hidden"
+          >
+            {/* Animated background orbs */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-yellow-300 opacity-10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+            
+            <div className="relative z-10">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-4 bg-white/20 backdrop-blur-sm rounded-2xl">
+                    <FaHeart className="text-5xl text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-4xl md:text-5xl font-black text-white mb-2 flex items-center gap-3">
+                      Your Saved Jobs
+                      <FaStar className="text-yellow-300 animate-pulse" />
+                    </h1>
+                    <p className="text-pink-100 text-lg">Jobs you've bookmarked for later review</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  <div className="px-6 py-3 bg-white/20 backdrop-blur-sm rounded-2xl">
+                    <div className="text-center">
+                      <div className="text-3xl font-black text-white">{savedJobs.length}</div>
+                      <div className="text-sm text-pink-100 font-medium">Saved</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
 
           {savedJobs.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6">
-              {savedJobs.map((job) => (
-                <div
+            <div className="grid grid-cols-1 gap-8">
+              {savedJobs.map((job, index) => (
+                <motion.div
                   key={job.id}
-                  className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all overflow-hidden border border-gray-100 group"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ y: -4 }}
+                  className="group relative bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-pink-300"
                 >
-                  <div className="p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3
-                            onClick={() => navigate(`/job-seeker/jobs/${job.id}`)}
-                            className="text-2xl font-bold text-gray-900 group-hover:text-primary-600 cursor-pointer transition-colors"
-                          >
-                            {job.title}
-                          </h3>
-                          <span className="px-3 py-1 bg-primary-100 text-primary-800 text-xs font-medium rounded-full">
-                            Saved {new Date(job.saved_at).toLocaleDateString()}
-                          </span>
+                  {/* Gradient overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  
+                  {/* Saved badge ribbon */}
+                  <div className="absolute top-4 right-4 z-10">
+                    <div className="px-4 py-2 bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl shadow-lg flex items-center gap-2">
+                      <FaHeart className="text-white animate-pulse" />
+                      <span className="text-white font-bold text-sm">
+                        Saved {new Date(job.saved_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="relative p-8">
+                    <div className="flex items-start justify-between gap-6">
+                      <div className="flex-1 pr-32">
+                        {/* Company Info */}
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="p-3 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl">
+                            <FaBuilding className="text-purple-600 text-xl" />
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-bold text-gray-500 uppercase tracking-wide">
+                              {job.company_name}
+                            </h4>
+                            <div className="flex items-center gap-1 mt-1">
+                              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                              <span className="text-xs text-green-600 font-bold">Now Accepting Applications</span>
+                            </div>
+                          </div>
                         </div>
+
+                        {/* Job Title */}
+                        <h3
+                          onClick={() => navigate(`/job-seeker/jobs/${job.id}`)}
+                          className="text-2xl md:text-3xl font-black text-gray-900 group-hover:text-purple-600 cursor-pointer transition-colors mb-6 leading-tight"
+                        >
+                          {job.title}
+                        </h3>
                         
-                        <p className="text-lg text-gray-600 mb-4">{job.company_name}</p>
-                        
-                        <div className="flex flex-wrap gap-4 mb-4 text-sm text-gray-600">
-                          <div className="flex items-center">
-                            <FaMapMarkerAlt className="mr-2 text-primary-600" />
-                            {job.location}
+                        {/* Job Details Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                          <div className="flex items-center gap-3 p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
+                            <div className="p-2 bg-white rounded-lg shadow-sm">
+                              <FaMapMarkerAlt className="text-blue-600" />
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500 font-medium">Location</p>
+                              <p className="text-sm font-bold text-gray-900">{job.location}</p>
+                            </div>
                           </div>
-                          <div className="flex items-center">
-                            <FaBriefcase className="mr-2 text-primary-600" />
-                            {job.job_type?.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+
+                          <div className="flex items-center gap-3 p-3 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl">
+                            <div className="p-2 bg-white rounded-lg shadow-sm">
+                              <FaBriefcase className="text-purple-600" />
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500 font-medium">Type</p>
+                              <p className="text-sm font-bold text-gray-900">
+                                {job.job_type?.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                              </p>
+                            </div>
                           </div>
+
                           {(job.salary_min || job.salary_max) && (
-                            <div className="flex items-center">
-                              <FaDollarSign className="mr-2 text-primary-600" />
-                              ${job.salary_min?.toLocaleString()} - ${job.salary_max?.toLocaleString()}
+                            <div className="flex items-center gap-3 p-3 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
+                              <div className="p-2 bg-white rounded-lg shadow-sm">
+                                <FaDollarSign className="text-green-600" />
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-500 font-medium">Salary Range</p>
+                                <p className="text-sm font-bold text-gray-900">
+                                  ${job.salary_min?.toLocaleString()} - ${job.salary_max?.toLocaleString()}
+                                </p>
+                              </div>
                             </div>
                           )}
                         </div>
 
-                        <p className="text-gray-700 line-clamp-2 mb-4">{job.description}</p>
+                        {/* Description */}
+                        <p className="text-gray-700 leading-relaxed mb-6 line-clamp-2">{job.description}</p>
                         
+                        {/* Skills */}
                         {job.required_skills && job.required_skills.length > 0 && (
                           <div className="flex flex-wrap gap-2">
-                            {job.required_skills.slice(0, 5).map((skill) => (
+                            {job.required_skills.slice(0, 6).map((skill) => (
                               <span
                                 key={skill.id}
-                                className="px-3 py-1 bg-primary-50 text-primary-700 text-xs font-medium rounded-full"
+                                className="px-4 py-2 bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 text-sm font-bold rounded-xl border border-purple-200 hover:border-purple-400 transition-colors"
                               >
                                 {skill.name}
                               </span>
                             ))}
-                            {job.required_skills.length > 5 && (
-                              <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
-                                +{job.required_skills.length - 5} more
+                            {job.required_skills.length > 6 && (
+                              <span className="px-4 py-2 bg-gray-100 text-gray-600 text-sm font-bold rounded-xl border border-gray-200">
+                                +{job.required_skills.length - 6} more
                               </span>
                             )}
                           </div>
                         )}
                       </div>
 
-                      <div className="flex flex-col space-y-3 ml-4">
-                        <button
+                      {/* Action Buttons - Vertical Stack */}
+                      <div className="absolute top-8 right-8 flex flex-col gap-3 mt-16">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => navigate(`/job-seeker/jobs/${job.id}`)}
-                          className="px-6 py-2 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 font-medium flex items-center"
+                          className="px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-black shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 whitespace-nowrap"
                         >
-                          <FaEye className="mr-2" /> View
-                        </button>
-                        <button
+                          <FaRocket className="text-lg" />
+                          View Details
+                        </motion.button>
+                        
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() => unsaveJob(job.id)}
-                          className="px-6 py-2 border-2 border-red-500 text-red-500 rounded-lg hover:bg-red-50 font-medium flex items-center"
+                          className="px-8 py-4 border-2 border-red-400 text-red-600 rounded-xl hover:bg-red-50 hover:border-red-500 font-bold transition-all duration-300 flex items-center gap-2 whitespace-nowrap"
                         >
-                          <FaTrash className="mr-2" /> Remove
-                        </button>
+                          <FaHeartBroken className="text-lg" />
+                          Remove
+                        </motion.button>
+
+                        {/* Time saved indicator */}
+                        <div className="mt-2 flex items-center gap-2 text-gray-500 text-sm justify-center">
+                          <FaClock />
+                          <span className="font-medium">Saved</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+
+                  {/* Animated shine effect */}
+                  <div className="absolute top-0 -left-full h-full w-1/2 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 group-hover:left-full transition-all duration-1000 ease-in-out"></div>
+                </motion.div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-20 bg-white rounded-xl shadow-lg">
-              <div className="text-gray-300 text-8xl mb-6">🔖</div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">No Saved Jobs Yet</h2>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center py-20 bg-white rounded-3xl shadow-2xl"
+            >
+              <div className="inline-block p-8 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full mb-6">
+                <FaHeartBroken className="text-gray-400 text-7xl" />
+              </div>
+              <h2 className="text-4xl font-black text-gray-900 mb-4">No Saved Jobs Yet</h2>
               <p className="text-gray-600 text-lg mb-8 max-w-md mx-auto">
-                Start exploring jobs and save the ones you're interested in for easy access later
+                Start exploring amazing opportunities and save the ones you love for easy access later!
               </p>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/job-seeker/jobs')}
-                className="px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl hover:from-primary-700 hover:to-primary-800 font-bold text-lg shadow-lg"
+                className="px-10 py-5 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded-2xl hover:from-pink-700 hover:to-purple-700 font-black text-lg shadow-2xl flex items-center gap-3 mx-auto"
               >
-                Browse Jobs
-              </button>
-            </div>
+                <FaFire className="text-2xl" />
+                Browse Jobs Now
+              </motion.button>
+            </motion.div>
           )}
         </div>
       </div>

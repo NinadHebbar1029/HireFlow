@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { SocketProvider } from './contexts/SocketContext';
 
 // Public Pages
 import LandingPage from './pages/public/LandingPage';
@@ -73,7 +74,7 @@ function App() {
   };
 
   return (
-    <>
+    <SocketProvider>
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={isAuthenticated ? <Navigate to={getDefaultRoute()} /> : <LandingPage />} />
@@ -126,7 +127,7 @@ function App() {
         draggable
         pauseOnHover
       />
-    </>
+    </SocketProvider>
   );
 }
 

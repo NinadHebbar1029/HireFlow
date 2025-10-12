@@ -20,6 +20,9 @@ export default {
           900: '#0c4a6e',
         },
       },
+      boxShadow: {
+        '3xl': '0 35px 60px -15px rgba(0, 0, 0, 0.3)',
+      },
     },
   },
   plugins: [],

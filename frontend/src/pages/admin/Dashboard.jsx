@@ -2,6 +2,9 @@
 import { FaUsers, FaBriefcase, FaFileAlt, FaChartLine, FaCheckCircle, FaTimesCircle, FaUserTie, FaBuilding } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../../utils/api';
+import PersonalizedGreeting from '../../components/PersonalizedGreeting';
+import ActivityFeed from '../../components/ActivityFeed';
+import { LineChartComponent, PieChartComponent } from '../../components/Charts';
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -16,6 +19,7 @@ const Dashboard = () => {
     hiredCount: 0
   });
   const [recentActivity, setRecentActivity] = useState([]);
+  const [analytics, setAnalytics] = useState(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -23,13 +27,16 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const [statsRes, activityRes] = await Promise.all([
+      const [statsRes, activityRes, analyticsRes] = await Promise.all([
         api.get('/admin/stats'),
-        api.get('/admin/recent-activity')
+        api.get('/admin/recent-activity'),
+        api.get('/analytics/admin/stats?period=7d')
       ]);
       setStats(statsRes.data);
       setRecentActivity(activityRes.data);
+      setAnalytics(analyticsRes.data);
     } catch (error) {
+      console.error('Dashboard fetch error:', error);
       toast.error('Failed to load dashboard data');
     } finally {
       setLoading(false);
@@ -58,10 +65,8 @@ const Dashboard = () => {
 
   return (
     <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-4xl font-bold text-gray-900">Admin Dashboard</h1>
-        <p className="text-gray-600 mt-2">Welcome to the HireFlow administration panel</p>
-      </div>
+      {/* Personalized Greeting */}
+      <PersonalizedGreeting stats={stats} userRole="admin" />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -115,7 +120,47 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* Recent Activity */}
+      {/* Charts and Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* User Growth Chart */}
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">User Growth (Last 7 Days)</h2>
+          {analytics?.userGrowth && analytics.userGrowth.length > 0 ? (
+            <LineChartComponent
+              data={analytics.userGrowth}
+              dataKeys={['count']}
+              xAxisKey="date"
+              height={250}
+            />
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-500">
+              <p>No data available</p>
+            </div>
+          )}
+        </div>
+
+        {/* User Distribution Chart */}
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">User Distribution</h2>
+          {analytics?.userDistribution && analytics.userDistribution.length > 0 ? (
+            <PieChartComponent
+              data={analytics.userDistribution.map(item => ({
+                name: item.role === 'job_seeker' ? 'Job Seekers' : item.role === 'recruiter' ? 'Recruiters' : 'Admins',
+                value: item.count
+              }))}
+              dataKey="value"
+              nameKey="name"
+              height={250}
+            />
+          ) : (
+            <div className="h-64 flex items-center justify-center text-gray-500">
+              <p>No data available</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Recent Activity and Overview */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">System Overview</h2>
@@ -139,23 +184,10 @@ const Dashboard = () => {
           </div>
         </div>
 
+        {/* Real-time Activity Feed */}
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Recent Activity</h2>
-          <div className="space-y-3 max-h-96 overflow-y-auto">
-            {recentActivity.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">No recent activity</p>
-            ) : (
-              recentActivity.map((activity, index) => (
-                <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all">
-                  <div className="w-2 h-2 bg-primary-600 rounded-full mt-2"></div>
-                  <div className="flex-1">
-                    <p className="text-gray-900 font-medium">{activity.description}</p>
-                    <p className="text-sm text-gray-500">{new Date(activity.timestamp).toLocaleString()}</p>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Live Activity Feed</h2>
+          <ActivityFeed userRole="admin" limit={10} />
         </div>
       </div>
 

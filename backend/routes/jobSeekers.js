@@ -67,20 +67,34 @@ router.put('/profile', authenticateToken, authorizeRoles('job_seeker'), checkUse
 // Upload resume
 router.post('/resume', authenticateToken, authorizeRoles('job_seeker'), checkUserStatus, upload.single('resume'), async (req, res) => {
   try {
+    console.log('Resume upload attempt - File received:', req.file ? req.file.originalname : 'No file');
+    
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
+
+    console.log('Uploading to Cloudinary:', {
+      filename: req.file.originalname,
+      size: req.file.size,
+      mimetype: req.file.mimetype
+    });
 
     // Upload to Cloudinary
     const result = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         { 
           folder: 'hireflow/resumes',
-          resource_type: 'raw'
+          resource_type: 'raw',
+          public_id: `resume_${req.user.id}_${Date.now()}`
         },
         (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
+          if (error) {
+            console.error('Cloudinary upload error:', error);
+            reject(error);
+          } else {
+            console.log('Cloudinary upload success:', result.secure_url);
+            resolve(result);
+          }
         }
       );
       uploadStream.end(req.file.buffer);
@@ -92,10 +106,11 @@ router.post('/resume', authenticateToken, authorizeRoles('job_seeker'), checkUse
       [result.secure_url, req.user.id]
     );
 
-    res.json({ message: 'Resume uploaded successfully', url: result.secure_url });
+    console.log('Resume URL updated in database');
+    res.json({ message: 'Resume uploaded successfully', resume_url: result.secure_url });
   } catch (error) {
     console.error('Upload resume error:', error);
-    res.status(500).json({ error: 'Failed to upload resume' });
+    res.status(500).json({ error: error.message || 'Failed to upload resume' });
   }
 });
 
@@ -127,7 +142,7 @@ router.post('/profile-image', authenticateToken, authorizeRoles('job_seeker'), c
       [result.secure_url, req.user.id]
     );
 
-    res.json({ message: 'Profile image uploaded successfully', url: result.secure_url });
+    res.json({ message: 'Profile image uploaded successfully', profile_image_url: result.secure_url });
   } catch (error) {
     console.error('Upload profile image error:', error);
     res.status(500).json({ error: 'Failed to upload profile image' });
@@ -217,7 +232,6 @@ router.get('/recommendations', authenticateToken, authorizeRoles('job_seeker'), 
 
     const skillIds = userSkills.map(s => s.id);
 
-    // Get jobs that match user skills
     const [jobs] = await db.query(`
       SELECT DISTINCT j.*, r.company_name, r.company_logo_url,
         COUNT(DISTINCT jrs.skill_id) as matched_skills,
@@ -233,19 +247,23 @@ router.get('/recommendations', authenticateToken, authorizeRoles('job_seeker'), 
       LIMIT 20
     `, [jobSeekerId]);
 
-    // Call AI service for personalized ranking
-    try {
-      const aiResponse = await axios.post(`${process.env.AI_SERVICE_URL}/recommend`, {
-        user_skills: userSkills.map(s => s.name),
-        jobs: jobs
-      }, { timeout: 5000 });
+    // Call AI service for personalized ranking (if available)
+    if (process.env.AI_SERVICE_URL) {
+      try {
+        const aiResponse = await axios.post(`${process.env.AI_SERVICE_URL}/recommend`, {
+          user_skills: userSkills.map(s => s.name),
+          jobs: jobs
+        }, { timeout: 5000 });
 
-      res.json(aiResponse.data.recommendations || jobs);
-    } catch (aiError) {
-      console.error('AI service error:', aiError.message);
-      // Fallback to regular skill matching
-      res.json(jobs);
+        return res.json(aiResponse.data.recommendations || jobs);
+      } catch (aiError) {
+        console.error('AI service error:', aiError.message);
+        // Fallback to regular skill matching
+      }
     }
+    
+    // Return skill-matched jobs (either as fallback or when AI service is not configured)
+    res.json(jobs);
   } catch (error) {
     console.error('Get recommendations error:', error);
     res.status(500).json({ error: 'Failed to fetch recommendations' });
