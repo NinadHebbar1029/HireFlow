@@ -28,6 +28,24 @@ const JobSeekerDashboard = () => {
     fetchDashboardData();
   }, []);
 
+  const calculateProfileCompletion = (profile) => {
+    if (!profile) return 0;
+    
+    let completionScore = 0;
+    const totalFields = 7; // Total number of fields to check
+    
+    // Check each field (each worth ~14.3% to total 100%)
+    if (profile.full_name) completionScore += 14.3;
+    if (profile.phone) completionScore += 14.3;
+    if (profile.location) completionScore += 14.3;
+    if (profile.bio) completionScore += 14.3;
+    if (profile.resume_url) completionScore += 14.3;
+    if (profile.profile_image_url) completionScore += 14.3;
+    if (profile.skills && profile.skills.length > 0) completionScore += 14.2; // Last field gets remainder
+    
+    return Math.round(completionScore);
+  };
+
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
@@ -37,6 +55,7 @@ const JobSeekerDashboard = () => {
       let savedJobs = [];
       let recommendationsList = [];
       let notificationsList = [];
+      let profileCompletion = 0;
       
       try {
         const applicationsRes = await api.get('/applications/my-applications');
@@ -73,9 +92,10 @@ const JobSeekerDashboard = () => {
       try {
         const recommendationsRes = await api.get('/job-seekers/recommendations');
         recommendationsList = recommendationsRes.data || [];
+        console.log('Recommendations received:', recommendationsList.length, recommendationsList);
         setRecommendations(recommendationsList.slice(0, 6));
       } catch (err) {
-        console.log('Recommendations not available');
+        console.error('Recommendations error:', err);
       }
       
       try {
@@ -86,7 +106,6 @@ const JobSeekerDashboard = () => {
         console.log('Notifications not available');
       }
 
-      // Fetch analytics
       try {
         const analyticsRes = await api.get('/analytics/job-seeker/stats');
         setAnalytics(analyticsRes.data);
@@ -94,11 +113,20 @@ const JobSeekerDashboard = () => {
         console.log('Analytics not available');
       }
 
+      // Fetch profile to calculate completion
+      try {
+        const profileRes = await api.get('/job-seekers/profile');
+        profileCompletion = calculateProfileCompletion(profileRes.data);
+      } catch (err) {
+        console.log('Profile not available');
+        profileCompletion = 0;
+      }
+
       // Calculate stats with available data
       setStats({
         totalApplications: applications.length,
         savedJobs: savedJobs.length,
-        profileCompletion: 75, // Calculate based on profile fields
+        profileCompletion: profileCompletion,
         interviewsScheduled: applications.filter(app => app.status === 'interviewed').length
       });
     } catch (error) {
@@ -322,14 +350,34 @@ const JobSeekerDashboard = () => {
                       <div className="inline-block p-6 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full mb-4">
                         <FaLightbulb className="text-blue-600 text-5xl" />
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">Get Personalized Recommendations</h3>
-                      <p className="text-gray-600 mb-6">Complete your profile to unlock AI-powered job matches!</p>
-                      <button
-                        onClick={() => navigate('/job-seeker/profile')}
-                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-                      >
-                        Complete Profile Now →
-                      </button>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                        {stats.profileCompletion < 70 ? 'Get Personalized Recommendations' : 'No Job Matches Yet'}
+                      </h3>
+                      <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                        {stats.profileCompletion < 70 
+                          ? 'Complete your profile and add skills to unlock AI-powered job matches!'
+                          : 'No jobs are currently available that match your skills. Check back soon or browse all jobs!'}
+                      </p>
+                      <div className="flex gap-4 justify-center">
+                        {stats.profileCompletion < 70 && (
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => navigate('/job-seeker/profile')}
+                            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                          >
+                            Complete Profile Now →
+                          </motion.button>
+                        )}
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => navigate('/job-seeker/jobs')}
+                          className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+                        >
+                          Browse All Jobs →
+                        </motion.button>
+                      </div>
                     </div>
                   )}
                 </div>

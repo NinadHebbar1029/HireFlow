@@ -18,14 +18,10 @@ const ApplicantProfile = () => {
 
   const fetchApplicantData = async () => {
     try {
-      console.log('Fetching applicant data for application ID:', applicantId);
       const response = await api.get(`/applications/${applicantId}/details`);
-      console.log('Application data received:', response.data);
       setApplication(response.data.application);
       setApplicant(response.data.applicant);
     } catch (error) {
-      console.error('Failed to load applicant profile:', error);
-      console.error('Error response:', error.response?.data);
       toast.error(error.response?.data?.error || 'Failed to load applicant profile');
     } finally {
       setLoading(false);

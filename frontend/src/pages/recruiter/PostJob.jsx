@@ -208,7 +208,7 @@ const PostJob = () => {
               <div className="space-y-6">
                 {/* Job Title */}
                 <div className="group">
-                  <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                  <label className="flex text-sm font-bold text-gray-700 mb-2 items-center gap-2">
                     <FaStar className="text-yellow-500" />
                     Job Title *
                   </label>
@@ -226,7 +226,7 @@ const PostJob = () => {
                 {/* Location and Job Type */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="group">
-                    <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                    <label className="flex text-sm font-bold text-gray-700 mb-2 items-center gap-2">
                       <FaMapMarkerAlt className="text-red-500" />
                       Location *
                     </label>
@@ -241,7 +241,7 @@ const PostJob = () => {
                     />
                   </div>
                   <div className="group">
-                    <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                    <label className="flex text-sm font-bold text-gray-700 mb-2 items-center gap-2">
                       <FaClock className="text-blue-500" />
                       Job Type *
                     </label>
@@ -252,10 +252,10 @@ const PostJob = () => {
                       required
                       className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all group-hover:border-gray-300 bg-white"
                     >
-                      <option value="full-time">?? Full Time</option>
-                      <option value="part-time">? Part Time</option>
-                      <option value="contract">?? Contract</option>
-                      <option value="internship">?? Internship</option>
+                      <option value="full-time">⏰ Full Time</option>
+                      <option value="part-time">⌚ Part Time</option>
+                      <option value="contract">📝 Contract</option>
+                      <option value="internship">🎓 Internship</option>
                     </select>
                   </div>
                 </div>
@@ -294,7 +294,7 @@ const PostJob = () => {
 
                 {/* Job Description */}
                 <div className="group">
-                  <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                  <label className="flex text-sm font-bold text-gray-700 mb-2 items-center gap-2">
                     <FaFileAlt className="text-purple-500" />
                     Job Description *
                   </label>
@@ -304,7 +304,7 @@ const PostJob = () => {
                     onChange={handleInputChange}
                     required
                     rows="8"
-                    placeholder="? Describe the role, responsibilities, and what makes this opportunity exciting...
+                    placeholder="✍️ Describe the role, responsibilities, and what makes this opportunity exciting...
 
 Example:
 - What will the candidate be working on?
@@ -320,7 +320,7 @@ Example:
 
                 {/* Requirements */}
                 <div className="group">
-                  <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                  <label className="flex text-sm font-bold text-gray-700 mb-2 items-center gap-2">
                     <FaCheckCircle className="text-green-500" />
                     Requirements *
                   </label>
@@ -330,7 +330,7 @@ Example:
                     onChange={handleInputChange}
                     required
                     rows="8"
-                    placeholder="?? List the qualifications, experience, and requirements...
+                    placeholder="📋 List the qualifications, experience, and requirements...
 
 Example:
 - 5+ years of experience in software development
@@ -397,7 +397,7 @@ Example:
                             onClick={() => toggleMandatory(skill.id)}
                             className="text-xs bg-white bg-opacity-30 px-3 py-1.5 rounded-full hover:bg-opacity-50 transition-all font-semibold"
                           >
-                            {skill.is_mandatory ? '? Required' : '?? Optional'}
+                            {skill.is_mandatory ? '✓ Required' : '○ Optional'}
                           </button>
                           <button
                             type="button"
@@ -434,14 +434,14 @@ Example:
                   }}
                   className="w-full px-5 py-4 border-2 border-purple-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-white text-lg font-semibold"
                 >
-                  <option value="">?? Select a skill to add...</option>
+                  <option value="">+ Select a skill to add...</option>
                   {skills.filter(s => !selectedSkills.find(ss => ss.id === s.id)).map(skill => (
                     <option key={skill.id} value={skill.id}>{skill.name}</option>
                   ))}
                 </select>
                 {selectedSkills.length === 0 && (
                   <p className="mt-3 text-sm text-red-600 font-semibold flex items-center gap-2">
-                    ?? Please add at least one skill to proceed
+                    ⚠ Please add at least one skill to proceed
                   </p>
                 )}
               </div>

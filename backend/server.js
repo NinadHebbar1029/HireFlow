@@ -11,14 +11,28 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    methods: ['GET', 'POST']
+    origin: [
+      'http://localhost:3000',
+      'http://hireflow-web.southeastasia.azurecontainer.io',
+      'http://20.247.244.140',
+      process.env.FRONTEND_URL
+    ].filter(Boolean),
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://hireflow-web.southeastasia.azurecontainer.io',
+    'http://20.247.244.140',
+    process.env.FRONTEND_URL
+  ].filter(Boolean),
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('combined'));
@@ -64,6 +78,22 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/face-recognition', require('./routes/faceRecognition'));
 app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/activity', require('./routes/activity'));
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'HireFlow API', 
+    version: '1.0.0',
+    status: 'running',
+    endpoints: {
+      health: '/health',
+      auth: '/api/auth',
+      jobs: '/api/jobs',
+      applications: '/api/applications',
+      users: '/api/users'
+    }
+  });
+});
 
 // Health check
 app.get('/health', (req, res) => {

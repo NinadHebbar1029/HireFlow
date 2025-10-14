@@ -87,6 +87,8 @@
 
 ## 🚀 Quick Start
 
+### Option 1: Docker (Recommended)
+
 ```bash
 # 1️⃣ Clone repository
 git clone https://github.com/yourusername/hireflow.git
@@ -102,7 +104,50 @@ docker-compose up -d
 # 4️⃣ Access application
 # 🌐 Frontend: http://localhost:3000
 # 🔌 Backend:  http://localhost:5000
+# 🤖 AI Service: http://localhost:8080
 ```
+
+### Option 2: Manual Setup
+
+```powershell
+# 1️⃣ Start Database (MySQL)
+# Install and start MySQL server
+
+# 2️⃣ Start Backend
+cd backend
+npm install
+# Configure .env file
+npm start
+
+# 3️⃣ Start Frontend (new terminal)
+cd frontend
+npm install
+npm run dev
+
+# 4️⃣ Start AI Service (new terminal)
+# Option A: Use helper script
+.\start-ai-service.ps1
+
+# Option B: Manual start
+cd ai-service
+pip install -r requirements.txt
+python app.py
+```
+
+### 🤖 AI Recommendations
+
+The AI service is **optional** but recommended for intelligent job matching:
+
+- **Running**: Provides AI-powered job recommendations using TF-IDF and skill matching
+- **Not Running**: Automatically falls back to SQL-based skill matching
+
+**To start AI service:**
+```powershell
+.\start-ai-service.ps1
+# OR manually: cd ai-service && python app.py
+```
+
+**Check status:** Admin Dashboard → Settings → AI Service Status Panel
 
 <details>
 <summary><b>📝 Environment Variables</b></summary>

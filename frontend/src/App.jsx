@@ -10,6 +10,10 @@ import LandingPage from './pages/public/LandingPage';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import AboutUs from './pages/public/AboutUs';
+import Contact from './pages/public/Contact';
+import PrivacyPolicy from './pages/public/PrivacyPolicy';
+import TermsOfService from './pages/public/TermsOfService';
 
 // Job Seeker Pages
 import JobSeekerDashboard from './pages/jobseeker/Dashboard';
@@ -39,6 +43,9 @@ import JobManagement from './pages/admin/JobManagement';
 import ApplicationManagement from './pages/admin/ApplicationManagement';
 import Analytics from './pages/admin/Analytics';
 import AdminSettings from './pages/admin/Settings';
+
+// Shared Pages
+import Notifications from './pages/Notifications';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -81,6 +88,13 @@ function App() {
         <Route path="/login" element={isAuthenticated ? <Navigate to={getDefaultRoute()} /> : <LoginPage />} />
         <Route path="/register" element={isAuthenticated ? <Navigate to={getDefaultRoute()} /> : <RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
+
+        {/* Shared Routes - Available to all authenticated users */}
+        <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
 
         {/* Job Seeker Routes */}
         <Route path="/job-seeker/dashboard" element={<ProtectedRoute allowedRoles={['job_seeker']}><JobSeekerDashboard /></ProtectedRoute>} />

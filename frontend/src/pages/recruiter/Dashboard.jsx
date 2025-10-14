@@ -36,7 +36,6 @@ const RecruiterDashboard = () => {
         const statsRes = await api.get('/recruiters/stats');
         setStats(statsRes.data);
       } catch (err) {
-        console.log('Stats not available, using defaults');
         // Stats will use default values
       }
       
@@ -49,14 +48,13 @@ const RecruiterDashboard = () => {
         // Get recent applications across all jobs
         if (activeJobsList.length > 0) {
           const applicationsPromises = activeJobsList.map(job => 
-            api.get(`/applications/job/${job.job_id}`).catch(() => ({ data: [] }))
+            api.get(`/applications/job/${job.id}`).catch(() => ({ data: [] }))
           );
           const applicationsResults = await Promise.all(applicationsPromises);
           const allApplications = applicationsResults.flatMap(res => res.data);
           setRecentApplications(allApplications.slice(0, 10));
         }
       } catch (err) {
-        console.log('Jobs not available, using defaults');
         // Jobs will use empty array
       }
 
@@ -65,7 +63,7 @@ const RecruiterDashboard = () => {
         const analyticsRes = await api.get('/analytics/recruiter/stats');
         setAnalytics(analyticsRes.data);
       } catch (err) {
-        console.log('Analytics not available');
+        // Analytics not available
       }
     } catch (error) {
       console.error('Dashboard error:', error);
@@ -312,7 +310,7 @@ const RecruiterDashboard = () => {
                   <div className="space-y-4">
                     {activeJobs.map((job) => (
                       <div 
-                        key={job.job_id}
+                        key={job.id}
                         className="group p-5 border-2 border-gray-100 rounded-xl hover:border-blue-300 hover:shadow-lg transition-all cursor-pointer bg-gradient-to-br from-white to-gray-50"
                         onClick={() => navigate(`/recruiter/jobs`)}
                       >

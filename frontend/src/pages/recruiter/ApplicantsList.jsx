@@ -36,12 +36,7 @@ const ApplicantsList = () => {
 
   const handleStatusChange = async (newStatus) => {
     try {
-      console.log('Updating application:', selectedApplication);
-      console.log('Application ID:', selectedApplication.id);
-      console.log('Application application_id:', selectedApplication.application_id);
-      
       const appId = selectedApplication.id || selectedApplication.application_id;
-      console.log('Using ID:', appId);
       
       await api.put(`/applications/${appId}/status`, {
         status: newStatus
@@ -349,7 +344,7 @@ const ApplicantsList = () => {
                 
                 <div className="flex lg:flex-col gap-3">
                   <button
-                    onClick={() => navigate(`/recruiter/applicant/${application.id}`)}
+                    onClick={() => navigate(`/recruiter/applicant/${application.application_id}`)}
                     className="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-5 py-3 rounded-xl hover:shadow-lg transition-all transform hover:scale-105 font-semibold"
                   >
                     <FaEye /> View Profile

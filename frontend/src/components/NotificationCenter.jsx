@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaBell, FaCheckCircle, FaTimes, FaExclamationCircle, FaInfoCircle } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import { useSocket } from '../contexts/SocketContext';
 import { toast } from 'react-toastify';
@@ -11,6 +12,7 @@ const NotificationCenter = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { socket } = useSocket();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchNotifications();
@@ -234,7 +236,7 @@ const NotificationCenter = () => {
                   <button
                     onClick={() => {
                       setIsOpen(false);
-                      // Navigate to notifications page if exists
+                      navigate('/notifications');
                     }}
                     className="text-primary-600 hover:text-primary-700 text-sm font-medium"
                   >

@@ -130,12 +130,15 @@ router.get('/job/:jobId', authenticateToken, authorizeRoles('recruiter'), checkU
     }
 
     const [applications] = await db.query(`
-      SELECT a.*, jsp.full_name, jsp.phone, jsp.location, jsp.bio, jsp.resume_url, jsp.profile_image_url,
+      SELECT a.id as application_id, a.job_id, a.job_seeker_id, a.cover_letter, a.status, a.applied_at, a.updated_at,
+        jsp.full_name, jsp.full_name as applicant_name, jsp.phone, jsp.location, jsp.bio, jsp.resume_url, jsp.profile_image_url,
         u.email,
+        j.title as job_title,
         GROUP_CONCAT(DISTINCT CONCAT(s.id, ':', s.name)) as skills
       FROM applications a
       JOIN job_seeker_profiles jsp ON a.job_seeker_id = jsp.id
       JOIN users u ON jsp.user_id = u.id
+      JOIN jobs j ON a.job_id = j.id
       LEFT JOIN job_seeker_skills jss ON jsp.id = jss.job_seeker_id
       LEFT JOIN skills s ON jss.skill_id = s.id
       WHERE a.job_id = ?

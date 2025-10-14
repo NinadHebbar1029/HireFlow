@@ -51,9 +51,7 @@ const JobSearch = () => {
       const response = await api.get('/applications/saved/my-saved-jobs');
       setSavedJobIds(response.data.map(job => job.id));
     } catch (error) {
-      console.log('Saved jobs not available');
       setSavedJobIds([]);
-      console.error('Failed to load saved jobs');
     }
   };
 

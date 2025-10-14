@@ -122,7 +122,7 @@ const SavedJobs = () => {
 
                   <div className="relative p-8">
                     <div className="flex items-start justify-between gap-6">
-                      <div className="flex-1 pr-32">
+                      <div className="flex-1 pr-64">
                         {/* Company Info */}
                         <div className="flex items-center gap-3 mb-4">
                           <div className="p-3 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl">
@@ -210,7 +210,7 @@ const SavedJobs = () => {
                       </div>
 
                       {/* Action Buttons - Vertical Stack */}
-                      <div className="absolute top-8 right-8 flex flex-col gap-3 mt-16">
+                      <div className="absolute top-24 right-8 flex flex-col gap-3">
                         <motion.button
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}

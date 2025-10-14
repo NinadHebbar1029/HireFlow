@@ -54,10 +54,7 @@ const JobSeekerProfile = () => {
         skill_name: skill.name
       }));
       setAvailableSkills(mappedSkills);
-      
-      console.log('Available skills loaded:', mappedSkills.length);
     } catch (error) {
-      console.error('Failed to load profile:', error);
       toast.error('Failed to load profile');
     } finally {
       setLoading(false);
@@ -97,26 +94,22 @@ const JobSeekerProfile = () => {
 
   const uploadImage = async () => {
     if (!imageFile) {
-      console.log('No image file selected');
       return null;
     }
     
     try {
       const formData = new FormData();
-      formData.append('profileImage', imageFile); // Changed from 'profile_image' to 'profileImage'
+      formData.append('profileImage', imageFile);
       
-      console.log('Uploading profile image:', imageFile.name);
       const res = await api.post('/job-seekers/profile-image', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
       
-      console.log('Image upload response:', res.data);
       toast.success('Profile image uploaded successfully!');
       return res.data.profile_image_url;
     } catch (error) {
-      console.error('Image upload error:', error);
       toast.error(error.response?.data?.error || 'Failed to upload image');
       throw error;
     }
@@ -124,7 +117,6 @@ const JobSeekerProfile = () => {
 
   const uploadResume = async () => {
     if (!resumeFile) {
-      console.log('No resume file selected');
       return null;
     }
     
@@ -132,18 +124,15 @@ const JobSeekerProfile = () => {
       const formData = new FormData();
       formData.append('resume', resumeFile);
       
-      console.log('Uploading resume:', resumeFile.name);
       const res = await api.post('/job-seekers/resume', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
       
-      console.log('Resume upload response:', res.data);
       toast.success('Resume uploaded successfully!');
       return res.data.resume_url;
     } catch (error) {
-      console.error('Resume upload error:', error);
       toast.error(error.response?.data?.error || 'Failed to upload resume');
       throw error;
     }

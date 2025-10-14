@@ -2,7 +2,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
-import { FaCog, FaLock, FaCamera, FaTrash, FaSave, FaSignOutAlt } from 'react-icons/fa';
+import { FaCog, FaLock, FaCamera, FaTrash, FaSave, FaSignOutAlt, FaUser, FaEnvelope, FaCalendarAlt, FaCheckCircle, FaShieldAlt, FaExclamationTriangle, FaBell } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 import { logout } from '../../redux/slices/authSlice';
 import api from '../../utils/api';
 import Layout from '../../components/Layout';
@@ -95,12 +96,14 @@ const JobSeekerSettings = () => {
       
       if (doubleConfirm) {
         try {
-          await api.delete('/users/me');
-          dispatch(logout());
-          navigate('/');
+          const response = await api.delete('/users/me');
           toast.success('Account deleted successfully');
+          dispatch(logout());
+          navigate('/login');
         } catch (error) {
-          toast.error('Failed to delete account');
+          console.error('Delete account error:', error);
+          const errorMsg = error.response?.data?.details || error.response?.data?.error || 'Failed to delete account';
+          toast.error(errorMsg);
         }
       }
     }
@@ -109,8 +112,16 @@ const JobSeekerSettings = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="flex justify-center items-center h-screen">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600"></div>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="relative inline-block">
+              <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-purple-600"></div>
+              <FaCog className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-purple-600 text-2xl animate-pulse" />
+            </div>
+            <p className="mt-6 text-xl font-semibold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Loading settings...
+            </p>
+          </div>
         </div>
       </Layout>
     );
@@ -118,201 +129,315 @@ const JobSeekerSettings = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center">
-              <FaCog className="mr-4 text-primary-600" />
-              Account Settings
-            </h1>
-            <p className="text-gray-600 text-lg">Manage your account preferences and security</p>
-          </div>
-
-          {/* Account Information */}
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Account Information</h2>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="text-sm text-gray-600">Email Address</p>
-                  <p className="text-lg font-semibold text-gray-900">{user?.email}</p>
-                </div>
-                <span className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                  Verified
-                </span>
-              </div>
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="text-sm text-gray-600">Account Type</p>
-                  <p className="text-lg font-semibold text-gray-900">Job Seeker</p>
-                </div>
-              </div>
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <p className="text-sm text-gray-600">Member Since</p>
-                  <p className="text-lg font-semibold text-gray-900">
-                    {user?.created_at && new Date(user.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Change Password */}
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-              <FaLock className="mr-3 text-primary-600" />
-              Change Password
-            </h2>
-            <form onSubmit={handlePasswordChange} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Current Password
-                </label>
-                <input
-                  type="password"
-                  value={passwordData.currentPassword}
-                  onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  New Password
-                </label>
-                <input
-                  type="password"
-                  value={passwordData.newPassword}
-                  onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  required
-                  minLength="6"
-                />
-                <p className="text-sm text-gray-500 mt-1">Must be at least 6 characters long</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Confirm New Password
-                </label>
-                <input
-                  type="password"
-                  value={passwordData.confirmPassword}
-                  onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={saving}
-                className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg hover:from-primary-700 hover:to-primary-800 font-semibold flex items-center disabled:opacity-50"
-              >
-                {saving ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Updating...
-                  </>
-                ) : (
-                  <>
-                    <FaSave className="mr-2" />
-                    Update Password
-                  </>
-                )}
-              </button>
-            </form>
-          </div>
-
-          {/* Face Recognition */}
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
-              <FaCamera className="mr-3 text-primary-600" />
-              Face Recognition Login
-            </h2>
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div className="flex-1">
-                <p className="font-semibold text-gray-900 mb-1">Enable Face Recognition</p>
-                <p className="text-sm text-gray-600">
-                  Login securely using your face instead of a password
-                </p>
-              </div>
-              <button
-                onClick={toggleFaceRecognition}
-                className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                  faceRecognitionEnabled ? 'bg-primary-600' : 'bg-gray-300'
-                }`}
-              >
-                <span
-                  className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                    faceRecognitionEnabled ? 'translate-x-7' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-            {faceRecognitionEnabled && (
-              <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-green-800 text-sm">
-                  ✓ Face recognition is enabled. You can now use face login on the login page.
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Danger Zone */}
-          <div className="bg-white rounded-xl shadow-lg p-6 border-2 border-red-200">
-            <h2 className="text-2xl font-bold text-red-600 mb-6">Danger Zone</h2>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 py-12">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Enhanced Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative bg-gradient-to-br from-purple-600 via-pink-600 to-indigo-600 rounded-3xl shadow-2xl p-10 mb-12 overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-yellow-300 opacity-10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
             
-            <div className="space-y-4">
-              <div className="p-4 bg-red-50 rounded-lg">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <p className="font-semibold text-gray-900 mb-1">Logout from all devices</p>
-                    <p className="text-sm text-gray-600">
-                      Sign out from your account on this device
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleLogout}
-                    className="ml-4 px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium flex items-center"
-                  >
-                    <FaSignOutAlt className="mr-2" />
-                    Logout
-                  </button>
-                </div>
+            <div className="relative z-10 flex items-center gap-6">
+              <div className="p-5 bg-white/20 backdrop-blur-sm rounded-2xl">
+                <FaCog className="text-6xl text-white animate-spin-slow" />
               </div>
-
-              <div className="p-4 bg-red-50 rounded-lg border-2 border-red-300">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <p className="font-semibold text-red-900 mb-1">Delete Account</p>
-                    <p className="text-sm text-red-700">
-                      Permanently delete your account and all associated data. This action cannot be undone.
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleDeleteAccount}
-                    className="ml-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium flex items-center"
-                  >
-                    <FaTrash className="mr-2" />
-                    Delete Account
-                  </button>
-                </div>
+              <div>
+                <h1 className="text-5xl font-black text-white mb-2">Account Settings</h1>
+                <p className="text-pink-100 text-lg">Manage your account preferences and security</p>
               </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Quick Actions */}
-          <div className="mt-6 flex items-center justify-between p-4 bg-gradient-to-r from-primary-50 to-purple-50 rounded-xl">
-            <p className="text-gray-700">
-              Need to update your profile information?
-            </p>
-            <button
-              onClick={() => navigate('/job-seeker/profile')}
-              className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium"
+          <div className="space-y-8">
+            {/* Account Information Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="bg-white rounded-2xl shadow-xl border-2 border-gray-100 overflow-hidden"
             >
-              Go to Profile
-            </button>
+              <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-6">
+                <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                  <FaUser className="text-3xl" />
+                  Account Information
+                </h2>
+              </div>
+              
+              <div className="p-8 space-y-4">
+                <div className="flex items-center justify-between p-5 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-blue-500 rounded-xl">
+                      <FaEnvelope className="text-white text-xl" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 font-medium">Email Address</p>
+                      <p className="text-lg font-bold text-gray-900">{user?.email}</p>
+                    </div>
+                  </div>
+                  <span className="px-4 py-2 bg-green-500 text-white rounded-full text-sm font-bold flex items-center gap-2 shadow-lg">
+                    <FaCheckCircle />
+                    Verified
+                  </span>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="p-5 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="p-2 bg-purple-500 rounded-lg">
+                        <FaUser className="text-white" />
+                      </div>
+                      <p className="text-sm text-gray-600 font-medium">Account Type</p>
+                    </div>
+                    <p className="text-lg font-bold text-gray-900 ml-11">Job Seeker</p>
+                  </div>
+
+                  <div className="p-5 bg-gradient-to-r from-pink-50 to-orange-50 rounded-xl border border-pink-200">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="p-2 bg-pink-500 rounded-lg">
+                        <FaCalendarAlt className="text-white" />
+                      </div>
+                      <p className="text-sm text-gray-600 font-medium">Member Since</p>
+                    </div>
+                    <p className="text-lg font-bold text-gray-900 ml-11">
+                      {user?.created_at && new Date(user.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Change Password Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-2xl shadow-xl border-2 border-gray-100 overflow-hidden"
+            >
+              <div className="bg-gradient-to-r from-indigo-500 to-purple-500 p-6">
+                <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                  <FaLock className="text-3xl" />
+                  Change Password
+                </h2>
+              </div>
+              
+              <form onSubmit={handlePasswordChange} className="p-8 space-y-6">
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-3">
+                    <FaShieldAlt className="text-indigo-600" />
+                    Current Password
+                  </label>
+                  <input
+                    type="password"
+                    value={passwordData.currentPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                    className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-purple-200 focus:border-purple-500 transition-all text-gray-900 font-medium"
+                    placeholder="Enter current password"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-3">
+                    <FaLock className="text-purple-600" />
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    value={passwordData.newPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                    className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-purple-200 focus:border-purple-500 transition-all text-gray-900 font-medium"
+                    placeholder="Enter new password"
+                    required
+                    minLength="6"
+                  />
+                  <p className="text-sm text-gray-500 mt-2 ml-1">Must be at least 6 characters long</p>
+                </div>
+
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-3">
+                    <FaCheckCircle className="text-green-600" />
+                    Confirm New Password
+                  </label>
+                  <input
+                    type="password"
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                    className="w-full px-5 py-4 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-purple-200 focus:border-purple-500 transition-all text-gray-900 font-medium"
+                    placeholder="Confirm new password"
+                    required
+                  />
+                </div>
+
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="submit"
+                  disabled={saving}
+                  className="w-full px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-black text-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {saving ? (
+                    <>
+                      <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-white"></div>
+                      Updating Password...
+                    </>
+                  ) : (
+                    <>
+                      <FaSave className="text-xl" />
+                      Update Password
+                    </>
+                  )}
+                </motion.button>
+              </form>
+            </motion.div>
+
+            {/* Face Recognition Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="bg-white rounded-2xl shadow-xl border-2 border-gray-100 overflow-hidden"
+            >
+              <div className="bg-gradient-to-r from-pink-500 to-rose-500 p-6">
+                <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                  <FaCamera className="text-3xl" />
+                  Face Recognition Login
+                </h2>
+              </div>
+              
+              <div className="p-8">
+                <div className="flex items-center justify-between p-6 bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl border-2 border-pink-200">
+                  <div className="flex-1">
+                    <p className="font-bold text-gray-900 mb-2 text-lg">Enable Face Recognition</p>
+                    <p className="text-sm text-gray-600">
+                      Login securely using your face instead of a password
+                    </p>
+                  </div>
+                  <button
+                    onClick={toggleFaceRecognition}
+                    className={`relative inline-flex h-10 w-20 items-center rounded-full transition-all duration-300 shadow-lg ${
+                      faceRecognitionEnabled ? 'bg-gradient-to-r from-pink-500 to-rose-500' : 'bg-gray-300'
+                    }`}
+                  >
+                    <span
+                      className={`flex items-center justify-center h-8 w-8 transform rounded-full bg-white shadow-md transition-transform duration-300 ${
+                        faceRecognitionEnabled ? 'translate-x-11' : 'translate-x-1'
+                      }`}
+                    >
+                      {faceRecognitionEnabled ? (
+                        <FaCheckCircle className="text-pink-500 text-sm" />
+                      ) : (
+                        <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                      )}
+                    </span>
+                  </button>
+                </div>
+                
+                {faceRecognitionEnabled && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="mt-6 p-5 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-xl"
+                  >
+                    <div className="flex items-start gap-3">
+                      <FaCheckCircle className="text-green-600 text-xl flex-shrink-0 mt-1" />
+                      <div>
+                        <p className="text-green-900 font-bold mb-1">Face Recognition Enabled!</p>
+                        <p className="text-green-700 text-sm">
+                          You can now use face login on the login page for quick and secure access.
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+            </motion.div>
+
+            {/* Danger Zone Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="bg-white rounded-2xl shadow-xl border-2 border-red-300 overflow-hidden"
+            >
+              <div className="bg-gradient-to-r from-red-500 to-rose-600 p-6">
+                <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                  <FaExclamationTriangle className="text-3xl" />
+                  Danger Zone
+                </h2>
+              </div>
+              
+              <div className="p-8 space-y-4">
+                <div className="p-6 bg-gray-50 rounded-xl border-2 border-gray-200">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <p className="font-bold text-gray-900 mb-2 text-lg flex items-center gap-2">
+                        <FaSignOutAlt className="text-gray-700" />
+                        Logout from Account
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        Sign out from your account on this device
+                      </p>
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleLogout}
+                      className="ml-6 px-8 py-3 bg-gray-600 text-white rounded-xl hover:bg-gray-700 font-bold flex items-center gap-2 shadow-lg transition-all"
+                    >
+                      <FaSignOutAlt />
+                      Logout
+                    </motion.button>
+                  </div>
+                </div>
+
+                <div className="p-6 bg-gradient-to-r from-red-50 to-rose-50 rounded-xl border-2 border-red-400">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <p className="font-bold text-red-900 mb-2 text-lg flex items-center gap-2">
+                        <FaTrash className="text-red-600" />
+                        Delete Account Permanently
+                      </p>
+                      <p className="text-sm text-red-700">
+                        Permanently delete your account and all associated data. This action cannot be undone.
+                      </p>
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleDeleteAccount}
+                      className="ml-6 px-8 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 font-bold flex items-center gap-2 shadow-lg transition-all"
+                    >
+                      <FaTrash />
+                      Delete
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Quick Navigation */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="flex items-center justify-between p-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-2xl"
+            >
+              <div className="text-white">
+                <p className="font-bold text-lg mb-1">Need to update your profile information?</p>
+                <p className="text-blue-100 text-sm">Manage your personal details, resume, and skills</p>
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate('/job-seeker/profile')}
+                className="px-8 py-4 bg-white text-purple-600 rounded-xl font-black shadow-lg hover:shadow-xl transition-all"
+              >
+                Go to Profile
+              </motion.button>
+            </motion.div>
           </div>
         </div>
       </div>

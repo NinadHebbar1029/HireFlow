@@ -1,7 +1,8 @@
 ﻿import { useState, useEffect } from 'react';
-import { FaCog, FaSave, FaBell, FaDatabase, FaShieldAlt, FaEnvelope, FaGlobe } from 'react-icons/fa';
+import { FaCog, FaSave, FaBell, FaDatabase, FaShieldAlt, FaEnvelope, FaGlobe, FaRobot } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import api from '../../utils/api';
+import AIServiceStatus from '../../components/AIServiceStatus';
 
 const Settings = () => {
   const [loading, setLoading] = useState(true);
@@ -68,6 +69,9 @@ const Settings = () => {
       </div>
 
       <div className="space-y-6">
+        {/* AI Service Status */}
+        <AIServiceStatus />
+
         {/* General Settings */}
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
