@@ -346,12 +346,14 @@ router.post('/save-job', authenticateToken, authorizeRoles('job_seeker'), checkU
     const { job_id } = req.body;
 
     if (!job_id) {
+      console.warn('Save job error: Job ID is required');
       return res.status(400).json({ error: 'Job ID is required' });
     }
 
     const [profiles] = await db.query('SELECT id FROM job_seeker_profiles WHERE user_id = ?', [req.user.id]);
     
     if (profiles.length === 0) {
+      console.warn(`Save job error: Job seeker profile not found for user ${req.user.id}`);
       return res.status(404).json({ error: 'Job seeker profile not found' });
     }
 
@@ -361,6 +363,7 @@ router.post('/save-job', authenticateToken, authorizeRoles('job_seeker'), checkU
     const [jobs] = await db.query('SELECT id FROM jobs WHERE id = ?', [job_id]);
     
     if (jobs.length === 0) {
+      console.warn(`Save job error: Job not found - job_id: ${job_id}`);
       return res.status(404).json({ error: 'Job not found' });
     }
 
@@ -370,9 +373,10 @@ router.post('/save-job', authenticateToken, authorizeRoles('job_seeker'), checkU
       [jobSeekerId, job_id]
     );
 
+    console.log(`Job saved successfully - user: ${req.user.id}, job: ${job_id}`);
     res.json({ message: 'Job saved successfully' });
   } catch (error) {
-    console.error('Save job error:', error);
+    console.error('Save job error:', error.message, error.stack);
     res.status(500).json({ error: 'Failed to save job' });
   }
 });
@@ -435,9 +439,34 @@ router.delete('/saved/:jobId', authenticateToken, authorizeRoles('job_seeker'), 
 
     await db.query('DELETE FROM saved_jobs WHERE job_seeker_id = ? AND job_id = ?', [jobSeekerId, jobId]);
 
+    console.log(`Job unsaved successfully - user: ${req.user.id}, job: ${jobId}`);
     res.json({ message: 'Job unsaved successfully' });
   } catch (error) {
-    console.error('Unsave job error:', error);
+    console.error('Unsave job error:', error.message);
+    res.status(500).json({ error: 'Failed to unsave job' });
+  }
+});
+
+// Unsave job - alternate route for frontend compatibility
+router.delete('/save-job/:jobId', authenticateToken, authorizeRoles('job_seeker'), checkUserStatus, async (req, res) => {
+  try {
+    const { jobId } = req.params;
+
+    const [profiles] = await db.query('SELECT id FROM job_seeker_profiles WHERE user_id = ?', [req.user.id]);
+    
+    if (profiles.length === 0) {
+      console.warn(`Unsave job error: Job seeker profile not found for user ${req.user.id}`);
+      return res.status(404).json({ error: 'Job seeker profile not found' });
+    }
+
+    const jobSeekerId = profiles[0].id;
+
+    await db.query('DELETE FROM saved_jobs WHERE job_seeker_id = ? AND job_id = ?', [jobSeekerId, jobId]);
+
+    console.log(`Job unsaved successfully - user: ${req.user.id}, job: ${jobId}`);
+    res.json({ message: 'Job unsaved successfully' });
+  } catch (error) {
+    console.error('Unsave job error:', error.message, error.stack);
     res.status(500).json({ error: 'Failed to unsave job' });
   }
 });
