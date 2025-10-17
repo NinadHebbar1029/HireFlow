@@ -4,19 +4,34 @@
 
 ### *AI-Powered Job Recruitment Platform*
 
-[![Production Ready](https://img.shields.io/badge/Status-Production%20Ready-success?style=flat-square)](https://github.com)
+[![Status](https://img.shields.io/badge/Status-Active%20Development-blue?style=flat-square)](https://github.com)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker&logoColor=white)](https://docker.com)
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=black)](https://reactjs.org)
 [![Node.js](https://img.shields.io/badge/Node.js-20-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
 
-**Smart job matching with AI-powered skill recommendations**
+**Smart job matching with AI-powered skill recommendations, resume uploads, and real-time messaging**
 
-[Features](#-features) • [Quick Start](#-quick-start) • [Tech Stack](#-tech-stack) • [API](#-api-endpoints)
+[Features](#-features) • [Status](#-current-status) • [Quick Start](#-quick-start) • [Tech Stack](#-tech-stack) • [API](#-api-endpoints)
 
 <img src="https://img.shields.io/badge/27-Pages-orange?style=flat-square" alt="Pages"/> <img src="https://img.shields.io/badge/11-API_Modules-blue?style=flat-square" alt="API Modules"/> <img src="https://img.shields.io/badge/3-User_Roles-green?style=flat-square" alt="User Roles"/>
 
 </div>
+
+---
+
+## 📊 Current Status
+
+| Component | Status | Details |
+|-----------|--------|---------|
+| **Frontend** | ✅ Production Ready | React 18, Vite, Tailwind CSS, Redux, Dark Mode Support |
+| **Backend** | ✅ Production Ready | Node.js/Express, JWT Auth, CORS Enabled, Real-time Socket.IO |
+| **Database** | ✅ MySQL 8.0 | SSL Connections, Automated Backups Ready |
+| **AI Service** | ✅ Optional | Python Flask, TF-IDF Matching, Scikit-learn |
+| **File Uploads** | ✅ Cloudinary | Resume uploads working, image optimization |
+| **Face Recognition** | ⚠️ Optional | CompreFace integration available (disabled by default) |
+| **Deployment** | ✅ Azure Ready | Docker containers, can run on VM or Container Instances |
+| **Real-time Features** | ✅ Socket.IO | Messages, Notifications, Activity Feed, User Presence |
 
 ---
 
@@ -28,39 +43,51 @@
 
 ### 👨‍💼 Job Seekers
 - 🤖 **AI Recommendations**  
-  Smart job matching
+  Smart job matching based on skills
 - 📄 **Resume Manager**  
-  Cloud storage
+  Cloud storage via Cloudinary
 - 📊 **Track Applications**  
-  Real-time status
+  Real-time status updates
 - 💬 **Direct Messaging**  
-  Chat with recruiters
+  Chat with recruiters in real-time
+- 🔖 **Save Jobs**  
+  Bookmark positions for later
+- 📈 **Activity Dashboard**  
+  Track your hiring journey
 
 </td>
 <td width="33%">
 
 ### 💼 Recruiters
 - 🎯 **Smart Filtering**  
-  Skill-based matching
+  Skill-based applicant matching
 - 🏢 **Company Profile**  
   Showcase your brand
-- 📈 **Analytics**  
-  Hiring insights
+- 📈 **Hiring Analytics**  
+  Insights & metrics
 - ✏️ **Job Management**  
-  Post, edit, delete
+  Post, edit, delete positions
+- 👥 **Applicant Tracking**  
+  Manage applications
+- 💬 **Recruiter Messaging**  
+  Direct communication
 
 </td>
 <td width="33%">
 
 ### 🛡️ Admins
 - 👥 **User Control**  
-  Approve/suspend users
-- 📊 **Analytics**  
-  Platform metrics
+  Approve/suspend accounts
+- 📊 **Platform Analytics**  
+  Comprehensive metrics
 - 🔒 **Security**  
-  Access management
-- 🔍 **Moderation**  
-  Content oversight
+  Role-based access control
+- 🔍 **Content Moderation**  
+  Oversight tools
+- 📋 **Job Listings**  
+  Manage all jobs
+- 🎛️ **AI Service Control**  
+  Toggle AI features
 
 </td>
 </tr>
@@ -75,11 +102,9 @@
 | 🎨 Frontend | 🔧 Backend | 🤖 AI/ML | ☁️ Services |
 |:---:|:---:|:---:|:---:|
 | React 18 | Node.js 20 | Python 3.11 | Docker |
-| Vite | Express | Scikit-learn | Cloudinary |
-| Tailwind CSS | MySQL 8.0 | TF-IDF | CompreFace* |
-| Redux Toolkit | JWT Auth | Flask | - |
-
-<sub>*Optional biometric authentication</sub>
+| Vite | Express 4 | Scikit-learn | Cloudinary |
+| Tailwind CSS | MySQL 8.0 | TF-IDF | Socket.IO |
+| Redux Toolkit | JWT Auth | Flask | CORS |
 
 </div>
 
@@ -87,90 +112,87 @@
 
 ## 🚀 Quick Start
 
-### Option 1: Docker (Recommended)
-
-```bash
-# 1️⃣ Clone repository
-git clone https://github.com/yourusername/hireflow.git
-cd hireflow
-
-# 2️⃣ Configure environment
-cp .env.example .env
-# Edit .env with your credentials (see below)
-
-# 3️⃣ Launch with Docker
-docker-compose up -d
-
-# 4️⃣ Access application
-# 🌐 Frontend: http://localhost:3000
-# 🔌 Backend:  http://localhost:5000
-# 🤖 AI Service: http://localhost:8080
-```
-
-### Option 2: Manual Setup
+### Option 1: Local Development (Recommended)
 
 ```powershell
-# 1️⃣ Start Database (MySQL)
-# Install and start MySQL server
+# 1️⃣ Clone repository
+git clone https://github.com/NinadHebbar1029/HireFlow.git
+cd HireFlow
 
-# 2️⃣ Start Backend
+# 2️⃣ Start MySQL (ensure MySQL server is running)
+# Windows: Use MySQL Workbench or MySQL Command Line
+
+# 3️⃣ Start Backend (Terminal 1)
 cd backend
 npm install
-# Configure .env file
 npm start
 
-# 3️⃣ Start Frontend (new terminal)
+# 4️⃣ Start Frontend (Terminal 2)
 cd frontend
 npm install
 npm run dev
 
-# 4️⃣ Start AI Service (new terminal)
-# Option A: Use helper script
+# 5️⃣ Start AI Service (Optional - Terminal 3)
 .\start-ai-service.ps1
+# Or manually: cd ai-service && pip install -r requirements.txt && python app.py
 
-# Option B: Manual start
-cd ai-service
-pip install -r requirements.txt
-python app.py
+# 6️⃣ Access Application
+# 🌐 Frontend: http://localhost:3000
+# 🔌 Backend:  http://localhost:5000
+# 🤖 AI Service: http://localhost:8080 (if running)
 ```
 
-### 🤖 AI Recommendations
+### Option 2: Docker (All-in-One)
 
-The AI service is **optional** but recommended for intelligent job matching:
+```bash
+# 1️⃣ Configure environment
+cp .env.example .env
+# Edit .env with your credentials
 
-- **Running**: Provides AI-powered job recommendations using TF-IDF and skill matching
-- **Not Running**: Automatically falls back to SQL-based skill matching
+# 2️⃣ Launch all services
+docker-compose up -d
 
-**To start AI service:**
-```powershell
-.\start-ai-service.ps1
-# OR manually: cd ai-service && python app.py
+# 3️⃣ Access application
+# 🌐 Frontend: http://localhost:3000
+# 🔌 Backend:  http://localhost:5000
 ```
 
-**Check status:** Admin Dashboard → Settings → AI Service Status Panel
+### 🔧 Environment Configuration
 
 <details>
-<summary><b>📝 Environment Variables</b></summary>
+<summary><b>📝 Required Environment Variables</b></summary>
 
+**Backend (.env in `/backend`)**
 ```env
-# Database
-MYSQL_ROOT_PASSWORD=your_secure_password
-MYSQL_DATABASE=hireflow_db
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=hireflow_db
 
 # Authentication
 JWT_SECRET=your_jwt_secret_minimum_32_characters
 
-# Cloudinary (Required - free tier available)
+# Cloudinary (Required for resume uploads)
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
 
-# Optional: Face Recognition
-COMPREFACE_API_KEY=your_key
-COMPREFACE_POSTGRES_PASSWORD=postgres_password
+# Server
+NODE_ENV=development
+PORT=5000
 ```
 
-> 💡 **Get Cloudinary free account:** [cloudinary.com/signup](https://cloudinary.com/users/register/free)
+**Frontend (.env in `/frontend`)**
+```env
+# API Configuration
+VITE_API_URL=http://localhost:5000
+```
+
+> 💡 **Get free accounts:**
+> - [Cloudinary](https://cloudinary.com/users/register/free) - Free tier includes 25GB storage
+> - [MySQL Community](https://dev.mysql.com/downloads/mysql/) - Open source database
 
 </details>
 
@@ -180,26 +202,185 @@ COMPREFACE_POSTGRES_PASSWORD=postgres_password
 
 ```
 HireFlow/
-├── 🎨 frontend/           # React application (27 pages)
-│   ├── public/           # Static assets
-│   └── src/
-│       ├── components/   # Reusable components
-│       ├── pages/        # Route pages
-│       ├── redux/        # State management
-│       └── utils/        # API client
+├── 🎨 frontend/               # React 18 Application
+│   ├── src/
+│   │   ├── components/        # Reusable UI components
+│   │   ├── pages/             # Route pages (27 total)
+│   │   ├── contexts/          # Theme & Socket context
+│   │   ├── redux/             # State management
+│   │   ├── utils/             # API client & helpers
+│   │   └── App.jsx            # Main app component
+│   ├── package.json
+│   └── tailwind.config.js     # Tailwind configuration
 │
-├── 🔧 backend/            # Express.js API (11 modules)
-│   ├── routes/           # API endpoints
-│   ├── middleware/       # Auth & validation
-│   ├── config/           # Database & services
-│   └── database/         # SQL schemas
+├── 🔧 backend/                # Express.js REST API
+│   ├── routes/                # API endpoints (11 modules)
+│   ├── middleware/            # Auth & validation
+│   ├── config/                # DB & Cloudinary config
+│   ├── database/              # SQL schemas
+│   ├── server.js              # Express server
+│   └── package.json
 │
-├── 🤖 ai-service/         # Python ML service
-│   ├── app.py           # Flask API
-│   └── requirements.txt
+├── 🤖 ai-service/             # Python ML Service
+│   ├── app.py                 # Flask API
+│   └── requirements.txt       # Python dependencies
 │
-└── 🐳 docker-compose.yml  # Container orchestration
+├── 🐳 docker-compose.yml      # Container orchestration
+├── README.md                  # This file
+└── .env.example              # Environment template
 ```
+
+---
+
+## 🔌 API Endpoints Summary
+
+### Authentication
+- `POST /api/auth/register` - Register new account
+- `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - User logout
+
+### Jobs
+- `GET /api/jobs` - List all jobs (with filters)
+- `POST /api/jobs` - Create job (recruiters)
+- `PUT /api/jobs/:id` - Update job
+- `DELETE /api/jobs/:id` - Delete job
+
+### Applications
+- `GET /api/applications/my-applications` - Get user applications
+- `POST /api/applications` - Submit application
+- `POST /api/applications/save-job` - Save job for later
+- `DELETE /api/applications/save-job/:jobId` - Unsave job
+
+### Job Seekers
+- `GET /api/job-seekers/profile` - Get profile
+- `PUT /api/job-seekers/profile` - Update profile
+- `POST /api/job-seekers/resume` - Upload resume (Cloudinary)
+- `GET /api/job-seekers/recommendations` - AI job matches
+
+### Messages & Notifications
+- `GET /api/messages` - Get messages
+- `POST /api/messages` - Send message
+- `GET /api/notifications` - Get notifications
+
+<sub>Full API documentation available in [`/backend/routes/`](./backend/routes/)</sub>
+
+---
+
+## 🤖 AI Matching Engine
+
+The AI recommendation system uses **TF-IDF (Term Frequency-Inverse Document Frequency)** vectorization:
+
+```
+User Profile (Skills) → TF-IDF Vector
+Job Description → TF-IDF Vector
+                ↓
+        Cosine Similarity
+                ↓
+        Match Score (0-100%)
+                ↓
+     Ranked Job Recommendations
+```
+
+**Features:**
+- 🔢 NLP-based skill matching
+- 📊 Cosine similarity calculation
+- 🎯 Intelligent ranking
+- ✅ Filters by minimum requirements
+- 🔄 Falls back to SQL matching if AI service is unavailable
+
+---
+
+## 🐳 Docker & Deployment
+
+### Run Locally with Docker
+```bash
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+
+# Full reset
+docker-compose down -v && docker-compose up -d
+```
+
+### Deploy to Azure VM
+```powershell
+# 1. Create Azure VM (Ubuntu/Linux recommended)
+# 2. SSH into VM
+# 3. Install Docker & Docker Compose
+# 4. Clone repository
+# 5. Configure .env with production credentials
+# 6. Run: docker-compose up -d
+```
+
+---
+
+## 🔒 Security & Best Practices
+
+| Category | Implementation |
+|----------|-----------------|
+| **Authentication** | ✅ JWT tokens, Bcrypt hashing, Role-based access |
+| **Authorization** | ✅ RBAC (Role-Based Access Control) |
+| **Data Protection** | ✅ SQL injection prevention, XSS protection |
+| **Network** | ✅ CORS enabled, HTTPS ready |
+| **File Uploads** | ✅ Cloudinary with validation |
+| **Database** | ✅ SSL connections, prepared statements |
+
+---
+
+## 🚨 Known Issues & Fixes
+
+| Issue | Status | Details |
+|-------|--------|---------|
+| Save/Unsave Jobs | ✅ Fixed | Added missing DELETE endpoint for job unsaving |
+| Resume Upload | ✅ Working | Cloudinary integration functional |
+| Real-time Messages | ✅ Working | Socket.IO connection established |
+| Dark Mode | ✅ Added | Theme context with system preference detection |
+
+---
+
+## 📝 Recent Updates
+
+- ✅ **Oct 18, 2025** - Fixed save/unsave job endpoints, added detailed error logging
+- ✅ **Oct 17, 2025** - Dark mode support implemented with Theme Context
+- ✅ **Oct 16, 2025** - Deleted Azure Container Instance deployments (cost optimization)
+- ✅ **Oct 14, 2025** - Resume upload working with Cloudinary integration
+- ✅ **Oct 13, 2025** - Real-time messaging and notifications implemented
+
+---
+
+## 📧 Support & Contact
+
+- 🐛 **Report Issues**: [GitHub Issues](https://github.com/NinadHebbar1029/HireFlow/issues)
+- 💡 **Request Features**: [GitHub Discussions](https://github.com/NinadHebbar1029/HireFlow/discussions)
+- 📧 **Email**: ninadhebbar2006@gmail.com
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<div align="center">
+
+### 🌟 Built with ❤️ for RIT SEM-V Capstone Project
+
+[![GitHub](https://img.shields.io/badge/GitHub-NinadHebbar1029-black?style=flat-square&logo=github)](https://github.com/NinadHebbar1029)
+[![Contributions Welcome](https://img.shields.io/badge/Contributions-Welcome-brightgreen?style=flat-square)](CONTRIBUTING.md)
+
+**[🐛 Report Bug](https://github.com/NinadHebbar1029/HireFlow/issues)** • **[💡 Request Feature](https://github.com/NinadHebbar1029/HireFlow/issues)** • **[⭐ Star Repo](https://github.com/NinadHebbar1029/HireFlow)**
+
+---
+
+*HireFlow - Connecting talent with opportunity through intelligent job matching* 🚀
+
+</div>
 
 ---
 
